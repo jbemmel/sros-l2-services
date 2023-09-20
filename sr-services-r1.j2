@@ -71,7 +71,7 @@ updates:
      ipv4:
       primary:
        address: "10.0.1.2"
-       prefix-length: 24
+       prefix-length: 32 # originally 24, but doesn't get advertised
      loopback: [null]
      gre-termination: True
      admin-state: enable
@@ -81,7 +81,7 @@ updates:
      - area-id: "0.0.0.0"
        interface:
        - interface-name: lo1
-         passive: False
+         passive: True
    ldp:
     targeted-session:
      peer:

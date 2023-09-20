@@ -51,11 +51,11 @@ groups:
     members: [ r1, r2, r3, r4 ]
     module: [ bgp, ospf, mpls, vlan, evpn ]
   gateway:
-    members: [ as9k ]
+    members: [ gw ]
     module: [ bgp, ospf, mpls, vlan, evpn ]
 
 nodes: 
- as9k:
+ gw:
   bgp.rr: True
   clab.type: sr-1
   config: [ sr-services-gw.j2 ]
@@ -100,9 +100,9 @@ links:
   pool: core
 
 - r1:
-  as9k:
+  gw:
   pool: core
 
 - r2:
-  as9k:
+  gw:
   pool: core
