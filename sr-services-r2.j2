@@ -87,6 +87,17 @@ updates:
      - ip-address: "10.0.1.1"
        local-lsr-id: 
         interface-name: lo1
+   mpls:
+    path: # RSVP-TE used by BGP-VPLS
+    - path-name: loose
+      admin-state: enable
+    lsp:
+    - lsp-name: "R1-R2"
+      type: p2p-rsvp
+      admin-state: enable
+      to: "10.11.0.1"
+      primary:
+      - path-name: "loose"
 
 - path: configure/service
   val:
@@ -148,10 +159,11 @@ updates:
      pw-template-binding:
      - pw-template-name: "PW1-use-prov-SDP"
    bgp-vpls:
+    admin-state: enable
     maximum-ve-id: 100
     ve:
-     name: "PE-1"
-     id: 1
+     name: "r2"
+     id: 2
    sap:
    - sap-id: "pxc-1.a:3"
 

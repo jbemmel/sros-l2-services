@@ -10,7 +10,7 @@ updates:
    bgp:
    - bgp-instance: 1
    bgp-evpn:
-    evi: 1
+    evi: 101
     mpls:
     - bgp-instance: 1
       admin-state: enable
@@ -23,5 +23,5 @@ updates:
     - name: {{ hostname }}
       eth-tag: {{ 1111 + id|int }}
     remote-attachment-circuit:
-    - name: as9k
+    - name: gw
       eth-tag: {{ 2222 + id|int }}

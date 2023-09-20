@@ -33,17 +33,18 @@ ServiceId    Type      Adm  Opr  CustomerId Service Name
 3            VPLS      Up   Up   1          BGP-VPLS-3
 4            VPLS      Up   Up   1          BGP-AD-VPLS-4
 5            Epipe     Up   Down 1          BGP-VPWS-5
+6            Epipe     Up   Up   1          BGP-EVPN-VPWS
 11           VPRN      Up   Up   1          client-1
 12           VPRN      Up   Up   1          client-2
 13           VPRN      Up   Up   1          client-3
 14           VPRN      Up   Up   1          client-4
 15           VPRN      Up   Up   1          client-5
+16           VPRN      Up   Up   1          client-6
 2147483648   IES       Up   Down 1          _tmnx_InternalIesService
 2147483649   intVpls   Up   Down 1          _tmnx_InternalVplsService
 -------------------------------------------------------------------------------
-Matching Services : 12
+Matching Services : 14
 -------------------------------------------------------------------------------
-===============================================================================
 ```
 
 Note how BGP-VPWS-5 is still down - being worked on
@@ -57,4 +58,65 @@ PING 10.0.12.22 56 data bytes
 64 bytes from 10.0.12.22: icmp_seq=3 ttl=64 time=2.74ms.
 ping aborted by user
 
+```
+
+## Status (on SR-1)
+
+|     Case      |   Working?  |
+| ------------- | ----------- |
+|  VPLS-1       |     ✅      |  `ping 10.0.11.21 router-instance "client-1"`
+|  Epipe-2      |     ✅      |  `ping 10.0.12.22 router-instance "client-2"`
+|  BGP-VPLS-3   |     ❌      |  `ping 10.0.13.23 router-instance "client-3"`
+| BGP-AD-VPLS-4 |     ❌      |  `ping 10.0.14.24 router-instance "client-4"`
+|  BGP-VPWS-5   |     ❌      |  `ping 10.0.15.25 router-instance "client-5"`
+| BGP-EVPN-VPWS |     ❌      |  `ping 10.0.16.26 router-instance "client-6"`
+
+### BGP l2-vpn status
+
+```
+A:admin@r1# /show router bgp neighbor "10.0.0.1" received-routes l2-vpn
+===============================================================================
+ BGP Router ID:10.0.0.2         AS:65000       Local AS:65000      
+===============================================================================
+ Legend -
+ Status codes  : u - used, s - suppressed, h - history, d - decayed, * - valid
+                 l - leaked, x - stale, > - best, b - backup, p - purge
+ Origin codes  : i - IGP, e - EGP, ? - incomplete
+
+===============================================================================
+BGP L2VPN Routes
+===============================================================================
+Flag  RouteType                   Prefix                             MED
+      RD                          SiteId                             Label
+      Nexthop                     VeId                   BlockSize   LocalPref
+      As-Path                     BaseOffset             vplsLabelBa 
+                                                         se          
+-------------------------------------------------------------------------------
+i     AutoDiscovery               10.0.0.2               -           0
+      10.0.0.2:60000              -                                  -
+      10.0.0.2                    -                      -           100
+      No As-Path                  -                      -            
+i     VPLS                        -                      -           0
+      10.0.0.2:60001              -                                  -
+      10.0.0.2                    1                      8           100
+      No As-Path                  1                      524271       
+i     VPWS                        -                      -           0
+      10.0.0.2:60002              -                                  -
+      10.0.0.2                    1                      1           100
+      No As-Path                  2                      524284       
+u*>i  AutoDiscovery               10.0.0.3               -           0
+      10.0.0.3:60000              -                                  -
+      10.0.0.3                    -                      -           100
+      No As-Path                  -                      -            
+u*>i  VPLS                        -                      -           0
+      10.0.0.3:60001              -                                  -
+      10.0.0.3                    2                      8           100
+      No As-Path                  1                      524271       
+u*>i  VPWS                        -                      -           0
+      10.0.0.3:60002              -                                  -
+      10.0.0.3                    2                      1           100
+      No As-Path                  1                      524282       
+-------------------------------------------------------------------------------
+Routes : 6
+===============================================================================
 ```
