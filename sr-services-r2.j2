@@ -1,3 +1,5 @@
+{% set GRE_SRC="10.0.2.1" %}
+
 updates:
 - path: configure/service/system
   val:
@@ -6,7 +8,7 @@ updates:
     community-value:
      start: 60000
      end: 65000
-   vpn-gre-source-ip: "10.0.1.3"
+   vpn-gre-source-ip: "{{ GRE_SRC }}"
 
 - path: configure/router[router-name=Base]/bgp/group[group-name=ibgp-ipv4]
   val:
@@ -67,7 +69,7 @@ updates:
    - interface-name: lo1
      ipv4:
       primary:
-       address: "10.0.1.3"
+       address: "{{ GRE_SRC }}"
        prefix-length: 32 # originally 24, but doesn't get advertised
      loopback: [null]
      gre-termination: True
@@ -82,7 +84,7 @@ updates:
    ldp:
     targeted-session:
      peer:
-     - ip-address: "10.0.1.2"
+     - ip-address: "10.0.1.1"
        local-lsr-id: 
         interface-name: lo1
 
@@ -93,14 +95,14 @@ updates:
      admin-state: enable
      signaling: tldp  # default
      far-end:
-      ip-address: "10.0.1.2"
-     local-end: "10.0.1.3"
+      ip-address: "10.0.1.1"
+     local-end: "{{ GRE_SRC }}"
    - sdp-id: 121
      admin-state: enable
-     local-end: "10.0.1.3"
      signaling: bgp
      far-end:
-      ip-address: "10.0.1.2"
+      ip-address: "10.0.1.1"
+     local-end: "{{ GRE_SRC }}"
 
    pw-template:
    - pw-template-name: "PW1-use-prov-SDP"
@@ -198,3 +200,30 @@ updates:
      id: 1
    sap:
    - sap-id: "pxc-1.a:5"
+
+- path: configure/service/epipe[service-name=BGP-EVPN-VPWS]
+  val:
+   admin-state: enable
+   customer: "1"
+   service-id: 6
+   description: "EVPN signalled E-pipe with tags"
+   bgp:
+   - bgp-instance: 1
+   bgp-evpn:
+    evi: 1
+    mpls:
+    - bgp-instance: 1
+      admin-state: enable
+      ecmp: {{ 2 if 'ixr' in clab.type else 32 }}
+      # ingress-replication-bum-label: True # TODO, requires reserved label range
+      auto-bind-tunnel:
+       resolution: any
+       ecmp: {{ 2 if 'ixr' in clab.type else 32 }}
+    local-attachment-circuit:
+    - name: {{ hostname }}
+      eth-tag: 2222
+    remote-attachment-circuit:
+    - name: r1
+      eth-tag: 1111
+   sap:
+   - sap-id: "pxc-1.a:6"
