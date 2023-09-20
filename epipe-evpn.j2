@@ -1,0 +1,27 @@
+updates:
+- path: configure/service/epipe[service-name=epipe1]
+  val:
+   admin-state: enable
+   customer: "1"
+   # Note: could set md-auto-id service range
+   service-id: 1
+   # service-mtu: {{ 1514 + 32 }}
+
+   bgp:
+   - bgp-instance: 1
+   bgp-evpn:
+    evi: 1
+    mpls:
+    - bgp-instance: 1
+      admin-state: enable
+      ecmp: {{ 2 if 'ixr' in clab.type else 32 }}
+      # ingress-replication-bum-label: True # TODO, requires reserved label range
+      auto-bind-tunnel:
+       resolution: any
+       ecmp: {{ 2 if 'ixr' in clab.type else 32 }}
+    local-attachment-circuit:
+    - name: {{ hostname }}
+      eth-tag: {{ 1111 + id|int }}
+    remote-attachment-circuit:
+    - name: as9k
+      eth-tag: {{ 2222 + id|int }}
