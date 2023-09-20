@@ -1,0 +1,13 @@
+updates:
+- path: configure/service/system
+  val:
+   bgp-auto-rd-range:
+    ip-address: "{{ loopback.ipv4 | ipaddr('address') }}"
+    community-value:
+     start: 60000
+     end: 65000
+
+- path: configure/router[router-name=Base]/bgp/group[group-name=ibgp-ipv4]
+  val:
+   family:
+    l2-vpn: True

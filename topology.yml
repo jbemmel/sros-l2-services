@@ -1,0 +1,108 @@
+name: L2-services
+
+message: |
+  This lab builds various L2 services on SR OS routers
+  
+  See https://documentation.nokia.com/cgi-bin/dbaccessfilename.cgi/3HE14991AAAITQZZA01_V1_Advanced%20Configuration%20Guide%20Part%20II%20for%20Releases%20Up%20To%2022.10.R3.pdf
+  page 102 and page 494
+
+  When deployed, the hosts should be able to reach each other:
+  docker exec -it clab-MPLS-L2-VPN-h1 ping -c3 172.16.0.7
+
+provider: clab
+
+defaults.device: sros
+
+bgp.as: 65000
+bgp.activate:
+ ipv4: [ebgp] # Don't use BGP ipv4 family for ibgp
+
+mpls.ldp: True # default
+
+addressing:
+  core:
+    # mtu: 1600 # For MPLS, cannot set this on a pool
+    ipv4: 10.11.0.0/16
+    prefix: 30
+  
+  hosts:
+    ipv4: 192.168.0.0/20
+    prefix: 24
+
+defaults.interfaces.mtu: 8192
+
+vlans:
+  tenant:
+    mode: bridge
+
+# evpn.vlans: [ evpn-epipe ] # Currently not set automatically
+
+ # Test
+ # vxlan-1:
+ #  id: 4
+ #  type: vxlan # epipe
+ #  evpn.evi: 1234 # only for 'vxlan' type service
+
+groups:
+  hosts:
+    members: [ h1, h2 ]
+    device: linux
+  routers:
+    members: [ r1, r2, r3, r4 ]
+    module: [ bgp, ospf, mpls, vlan, evpn ]
+  gateway:
+    members: [ as9k ]
+    module: [ bgp, ospf, mpls, vlan, evpn ]
+
+nodes: 
+ as9k:
+  bgp.rr: True
+  clab.type: sr-1
+  config: [ sr-services-gw.j2 ]
+ r1:
+  clab.type: sr-1  # sr-1-46S
+  config: [ sr-services-r1.j2 ]
+ r2:
+  clab.type: sr-1  # sr-1-46S
+  config: [ sr-services-r2.j2 ]
+ r3:
+  clab.type: ixr-ec
+  config: [ epipe-evpn.j2 ]
+ r4:
+  clab.type: ixr-ec
+  config: [ epipe-evpn.j2 ]
+ h1:
+ h2:
+
+links:
+- r3:
+   vlan.access: tenant
+  h1:
+
+- r4:
+   vlan.access: tenant
+  h2:
+
+- r1:
+  r2:
+  pool: core
+
+- r1:
+  r3:
+  pool: core
+
+- r2:
+  r4:
+  pool: core
+
+- r3:
+  r4:
+  pool: core
+
+- r1:
+  as9k:
+  pool: core
+
+- r2:
+  as9k:
+  pool: core

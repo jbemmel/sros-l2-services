@@ -1,0 +1,203 @@
+# See: https://documentation.nokia.com/cgi-bin/dbaccessfilename.cgi/3HE14991AAAITQZZA01_V1_Advanced%20Configuration%20Guide%20Part%20II%20for%20Releases%20Up%20To%2022.10.R3.pdf
+# page 105
+
+updates:
+- path: configure/service/system
+  val:
+   bgp-auto-rd-range:
+    ip-address: "{{ loopback.ipv4 | ipaddr('address') }}"
+    community-value:
+     start: 60000
+     end: 65000
+   vpn-gre-source-ip: "10.0.1.2"
+
+- path: configure/router[router-name=Base]/bgp/group[group-name=ibgp-ipv4]
+  val:
+   family:
+    l2-vpn: True
+
+{# MAC chip loopbacks pxc-1 and pxc-2 #}
+- path: configure/card[slot-number=1]/mda[mda-slot=1]/xconnect
+  val:
+   mac:
+   - mac-id: 1
+     loopback:
+     - loopback-id: 1
+     - loopback-id: 2
+
+- path: configure/port-xc
+  val:
+   pxc:
+   - pxc-id: 1
+     port-id: 1/1/m1/1
+     admin-state: enable
+     description: "origination"
+   - pxc-id: 2
+     port-id: 1/1/m1/2
+     admin-state: enable
+     description: "termination"
+
+{% for id in ['pxc-1.a','pxc-1.b','pxc-2.a','pxc-2.b','1/1/m1/1','1/1/m1/2'] %}
+- path: configure/port[port-id={{id}}]
+  val:
+   admin-state: enable
+{%  if 'pxc' in id %}
+   ethernet:
+    encap-type: dot1q
+{%  endif %}
+{% endfor %}
+
+# Clients
+{% for c in [ 1,2,3,4,5 ] %}
+- path: configure/service/vprn[service-name=client-{{c}}]
+  val:
+   admin-state: enable
+   customer: "1"
+   service-id: {{ 10 + c }}
+   interface:
+   - interface-name: ping
+     ipv4:
+      primary:
+       address: "10.0.{{ c + 10 }}.{{ c + 10 }}"
+       prefix-length: 24
+     sap:
+     - sap-id: "pxc-1.b:{{ c }}"
+{% endfor %}
+
+- path: configure/router[router-name=Base]
+  val:
+   interface:
+   - interface-name: lo1
+     ipv4:
+      primary:
+       address: "10.0.1.2"
+       prefix-length: 24
+     loopback: [null]
+     gre-termination: True
+     admin-state: enable
+   ospf:
+   - ospf-instance: 0
+     area:
+     - area-id: "0.0.0.0"
+       interface:
+       - interface-name: lo1
+         passive: False
+   ldp:
+    targeted-session:
+     peer:
+     - ip-address: "10.0.1.3"
+       local-lsr-id: 
+        interface-name: lo1
+
+- path: configure/service
+  val:
+   sdp:
+   - sdp-id: 120
+     admin-state: enable
+     signaling: tldp  # default
+     far-end:
+      ip-address: "10.0.1.3"
+     local-end: "10.0.1.2"
+   - sdp-id: 121
+     admin-state: enable
+     local-end: "10.0.1.2"
+     signaling: bgp
+     far-end:
+      ip-address: "10.0.1.3"
+
+   pw-template:
+   - pw-template-name: "PW1-use-prov-SDP"
+     pw-template-id: 1
+     provisioned-sdp: use
+     control-word: False  # default
+     vc-type: ether       # default, also 'vlan' is available
+
+- path: configure/service/vpls[service-name=VPLS-1]
+  val:
+   admin-state: enable
+   customer: "1"
+   service-id: 1
+   description: "VPLS 1 with manually configured spoke-SDP"
+   sap:
+   - sap-id: "pxc-1.a:1"
+   spoke-sdp:
+   - sdp-bind-id: "120:1"
+
+- path: configure/service/epipe[service-name=Epipe-2]
+  val:
+   admin-state: enable
+   customer: "1"
+   service-id: 2
+   description: "Epipe 2 with manually configured spoke-SDP"
+   sap:
+   - sap-id: "pxc-1.a:2"
+   spoke-sdp:
+   - sdp-bind-id: "120:2"
+
+- path: configure/service/vpls[service-name=BGP-VPLS-3]
+  val:
+   admin-state: enable
+   customer: "1"
+   service-id: 3
+   description: "BGP-VPLS with use provisioned SDP instead of spoke"
+   bgp:
+   - bgp-instance: 1
+     route-distinguisher: "auto-rd"
+     route-target:
+      export: "target:64500:3"
+      import: "target:64500:3"
+     pw-template-binding:
+     - pw-template-name: "PW1-use-prov-SDP"
+   bgp-vpls:
+    maximum-ve-id: 100
+    ve:
+     name: "PE-1"
+     id: 1
+   sap:
+   - sap-id: "pxc-1.a:3"
+
+- path: configure/service/vpls[service-name=BGP-AD-VPLS-4]
+  val:
+   admin-state: enable
+   customer: "1"
+   service-id: 4
+   description: "BGP-AD for LDP VPLS with use provisioned SDP"
+   bgp:
+   - bgp-instance: 1
+     route-distinguisher: "auto-rd"
+     route-target:
+      export: "target:64500:4"
+      import: "target:64500:4"
+     pw-template-binding:
+     - pw-template-name: "PW1-use-prov-SDP"
+   bgp-ad:
+    vpls-id: "64500:4"
+    admin-state: enable
+   sap:
+   - sap-id: "pxc-1.a:4"
+
+# See RFC 4447, Pseudowire Setup and Maintenance Using the Label Distribution Protocol (LDP)
+- path: configure/service/epipe[service-name=BGP-VPWS-5]
+  val:
+   admin-state: enable
+   customer: "1"
+   service-id: 5
+   description: "BGP-VPWS with use provisioned SDP"
+   bgp:
+   - bgp-instance: 1
+     route-distinguisher: "auto-rd"
+     route-target:
+      export: "target:64500:5"
+      import: "target:64500:5"
+     pw-template-binding:
+     - pw-template-name: "PW1-use-prov-SDP"
+   bgp-vpws:
+    admin-state: enable
+    local-ve:
+     name: "R1"
+     id: 1
+    remote-ve:
+     name: "R2"
+     id: 2
+   sap:
+   - sap-id: "pxc-1.a:5"
