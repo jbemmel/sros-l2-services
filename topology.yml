@@ -36,22 +36,22 @@ vlans:
     mode: bridge
   c1:
     id: 11
-    mode: bridge
+    mode: irb
   c2:
     id: 12
-    mode: bridge
+    mode: irb
   c3:
     id: 13
-    mode: bridge
+    mode: irb
   c4:
     id: 14
-    mode: bridge
+    mode: irb
   c5:
     id: 15
-    mode: bridge
+    mode: irb
   c6:
     id: 16
-    mode: bridge
+    mode: irb
 
 
 # evpn.vlans: [ evpn-epipe ] # Currently not set automatically
@@ -86,9 +86,11 @@ nodes:
   clab.type: sr-1  # sr-1-46S
   config: [ sr-services-r2.j2 ]
  r3:
+  vlan.mode: bridge
   clab.type: ixr-ec
   config: [ sr-services-ixr-r3.j2 ]
  r4:
+  vlan.mode: bridge
   clab.type: ixr-ec
   config: [ sr-services-ixr-r4.j2 ]
  h1:
@@ -96,13 +98,11 @@ nodes:
 
 links:
 - r3: # IXR does not support pxc X-connect ports
-    ipv4: false
   h1:
   vlan.trunk: [c1,c2,c3,c4,c5,c6]
   # pool: l2only
 
 - r4:
-    ipv4: false
   h2:
   vlan.trunk: [c1,c2,c3,c4,c5,c6]
   # pool: l2only

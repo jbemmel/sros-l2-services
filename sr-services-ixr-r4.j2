@@ -23,19 +23,9 @@ updates:
 - path: configure/router[router-name=Base]/bgp
   val:
    group:
-   - group-name: l2-vpn
-     admin-state: enable
-     local-address: "{{ GRE_SRC }}"
-     peer-as: 65000
+   - group-name: ibgp-ipv4
      family:
-      l2-vpn: True
-     import:
-      policy: ["accept_all"]
-     export:
-      policy: ["accept_all"]
-   neighbor:
-   - ip-address: 10.0.255.1
-     group: l2-vpn
+      l2-vpn: True # Add l2-vpn family to existing EVPN group
 
 {# MAC chip loopbacks pxc-1 and pxc-2, not suppported
 - path: configure/card[slot-number=1]/mda[mda-slot=1]/xconnect
@@ -118,7 +108,7 @@ updates:
     - lsp-name: "R3-R4"
       type: p2p-rsvp
       admin-state: enable
-      to: "10.0.0.4"
+      to: 10.0.0.4
       primary:
       - path-name: "loose"
 
@@ -132,6 +122,8 @@ updates:
       ip-address: "10.0.0.4"
      # local-end: "{{ GRE_SRC }}"
      delivery-type: mpls # Must be specified, not implied by source address and cannot be 'gre'
+     lsp:
+     - lsp-name: "R3-R4"
    - sdp-id: 121
      admin-state: enable
      signaling: bgp
@@ -139,6 +131,8 @@ updates:
       ip-address: "10.0.0.4"  # Must match BGP peering IP
      # local-end: "{{ GRE_SRC }}"
      delivery-type: mpls # Must be specified, not implied by source address and cannot be 'gre'
+     lsp:
+     - lsp-name: "R3-R4"
 
    pw-template:
    - pw-template-name: "PW1-use-prov-SDP"

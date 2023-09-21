@@ -47,6 +47,8 @@ updates:
    - group-name: ibgp-ipv4
      peer-ip-tracking: true
      split-horizon: true
+     family:
+      l2-vpn: True # For IXR nodes, use single group for both protocol families
    neighbor:
    - ip-address: 10.0.1.1
      group: l2-vpn
