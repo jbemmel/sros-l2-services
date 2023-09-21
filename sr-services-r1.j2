@@ -13,10 +13,22 @@ updates:
      end: 65000
    vpn-gre-source-ip: "{{ GRE_SRC }}"
 
-- path: configure/router[router-name=Base]/bgp/group[group-name=ibgp-ipv4]
+- path: configure/router[router-name=Base]/bgp
   val:
-   family:
-    l2-vpn: True
+   group:
+   - group-name: l2-vpn
+     admin-state: enable
+     local-address: "{{ GRE_SRC }}"
+     peer-as: 65000
+     family:
+      l2-vpn: True
+     import:
+      policy: ["accept_all"]
+     export:
+      policy: ["accept_all"]
+   neighbor:
+   - ip-address: 10.0.255.1
+     group: l2-vpn
 
 {# MAC chip loopbacks pxc-1 and pxc-2 #}
 - path: configure/card[slot-number=1]/mda[mda-slot=1]/xconnect
@@ -115,7 +127,7 @@ updates:
      admin-state: enable
      signaling: bgp
      far-end:
-      ip-address: "10.0.2.1"
+      ip-address: "10.0.2.1"  # Must match BGP peering IP
      local-end: "{{ GRE_SRC }}"
 
    pw-template:

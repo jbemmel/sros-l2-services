@@ -66,9 +66,9 @@ ping aborted by user
 | ------------- | ----------- |
 |  VPLS-1       |     ✅      |  `ping 10.0.11.21 router-instance "client-1"`
 |  Epipe-2      |     ✅      |  `ping 10.0.12.22 router-instance "client-2"`
-|  BGP-VPLS-3   |     ❌      |  `ping 10.0.13.23 router-instance "client-3"`
-| BGP-AD-VPLS-4 |     ❌      |  `ping 10.0.14.24 router-instance "client-4"`
-|  BGP-VPWS-5   |     ❌      |  `ping 10.0.15.25 router-instance "client-5"`
+|  BGP-VPLS-3   |     ✅      |  `ping 10.0.13.23 router-instance "client-3"`, requires SDP local/far end to match BGP peering addresses
+| BGP-AD-VPLS-4 |     ✅      |  `ping 10.0.14.24 router-instance "client-4"`, SDP local/far match *and* GRE loopback IP must match iBGP peering IP
+|  BGP-VPWS-5   |     ✅      |  `ping 10.0.15.25 router-instance "client-5"`, requires SDP local/far end to match BGP peering addresses
 | BGP-EVPN-VPWS |     ❌      |  `ping 10.0.16.26 router-instance "client-6"`
 
 ### BGP l2-vpn status
