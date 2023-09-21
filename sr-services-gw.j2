@@ -44,6 +44,9 @@ updates:
       policy: ["accept_all"]
      export:
       policy: ["accept_all"]
+   - group-name: ibgp-ipv4
+     peer-ip-tracking: true
+     split-horizon: true
    neighbor:
    - ip-address: 10.0.1.1
      group: l2-vpn
