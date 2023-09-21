@@ -136,6 +136,7 @@ updates:
      provisioned-sdp: use
      control-word: False  # default
      vc-type: ether       # default, also 'vlan' is available
+     force-vc-forwarding: vlan # add a tag (equivalent to vc-type vlan) and allows for customer QoS transparency (dot1p + Drop Eligibility (DE) bits)
 
 - path: configure/service/vpls[service-name=VPLS-1]
   val:
@@ -233,7 +234,7 @@ updates:
    admin-state: enable
    customer: "1"
    service-id: 6
-   description: "EVPN signalled E-pipe with tags"
+   description: "EVPN for MPLS Tunnels in Epipe Services (EVPN-VPWS)"
    bgp:
    - bgp-instance: 1
    bgp-evpn:
@@ -245,12 +246,14 @@ updates:
       # ingress-replication-bum-label: True # TODO, requires reserved label range
       auto-bind-tunnel:
        resolution: any
+       # resolution-filter:
+       #  ldp: True # Without this, preference is given to RSVP
        ecmp: {{ 2 if 'ixr' in clab.type else 32 }}
     local-attachment-circuit:
-    - name: {{ hostname }}
-      eth-tag: 1111
+    - name: r1
+      eth-tag: 11
     remote-attachment-circuit:
     - name: r2
-      eth-tag: 2222
+      eth-tag: 22
    sap:
    - sap-id: "pxc-1.a:6"

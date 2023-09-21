@@ -34,6 +34,25 @@ defaults.interfaces.mtu: 8192
 vlans:
   tenant:
     mode: bridge
+  c1:
+    id: 11
+    mode: bridge
+  c2:
+    id: 12
+    mode: bridge
+  c3:
+    id: 13
+    mode: bridge
+  c4:
+    id: 14
+    mode: bridge
+  c5:
+    id: 15
+    mode: bridge
+  c6:
+    id: 16
+    mode: bridge
+
 
 # evpn.vlans: [ evpn-epipe ] # Currently not set automatically
 
@@ -46,7 +65,8 @@ vlans:
 groups:
   hosts:
     members: [ h1, h2 ]
-    device: linux
+    device: frr
+    module: [ vlan ]
   routers:
     members: [ r1, r2, r3, r4 ]
     module: [ bgp, ospf, mpls, vlan, evpn ]
@@ -67,21 +87,25 @@ nodes:
   config: [ sr-services-r2.j2 ]
  r3:
   clab.type: ixr-ec
-  config: [ epipe-evpn.j2 ]
+  config: [ sr-services-ixr-r3.j2 ]
  r4:
   clab.type: ixr-ec
-  config: [ epipe-evpn.j2 ]
+  config: [ sr-services-ixr-r4.j2 ]
  h1:
  h2:
 
 links:
-- r3:
-   vlan.access: tenant
+- r3: # IXR does not support pxc X-connect ports
+    ipv4: false
   h1:
+  vlan.trunk: [c1,c2,c3,c4,c5,c6]
+  # pool: l2only
 
 - r4:
-   vlan.access: tenant
+    ipv4: false
   h2:
+  vlan.trunk: [c1,c2,c3,c4,c5,c6]
+  # pool: l2only
 
 - r1:
   r2:

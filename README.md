@@ -32,7 +32,7 @@ ServiceId    Type      Adm  Opr  CustomerId Service Name
 2            Epipe     Up   Up   1          Epipe-2
 3            VPLS      Up   Up   1          BGP-VPLS-3
 4            VPLS      Up   Up   1          BGP-AD-VPLS-4
-5            Epipe     Up   Down 1          BGP-VPWS-5
+5            Epipe     Up   Up   1          BGP-VPWS-5
 6            Epipe     Up   Up   1          BGP-EVPN-VPWS
 11           VPRN      Up   Up   1          client-1
 12           VPRN      Up   Up   1          client-2
@@ -46,8 +46,6 @@ ServiceId    Type      Adm  Opr  CustomerId Service Name
 Matching Services : 14
 -------------------------------------------------------------------------------
 ```
-
-Note how BGP-VPWS-5 is still down - being worked on
 
 For example, to test service Epipe-2:
 ```
@@ -69,7 +67,15 @@ ping aborted by user
 |  BGP-VPLS-3   |     ✅      |  `ping 10.0.13.23 router-instance "client-3"`, requires SDP local/far end to match BGP peering addresses
 | BGP-AD-VPLS-4 |     ✅      |  `ping 10.0.14.24 router-instance "client-4"`, SDP local/far match *and* GRE loopback IP must match iBGP peering IP
 |  BGP-VPWS-5   |     ✅      |  `ping 10.0.15.25 router-instance "client-5"`, requires SDP local/far end to match BGP peering addresses
-| BGP-EVPN-VPWS |     ❌      |  `ping 10.0.16.26 router-instance "client-6"`
+| BGP-EVPN-VPWS |     ✅      |  `ping 10.0.16.26 router-instance "client-6"`
+
+## Status (on IXR-ec)
+
+The configuration for the services is similar, with a few key differences:
+* IXR-ec does not support GRE to/from a non-system loopback, or pxc (cross-connect) ports; those are FP4/FP5 specific features
+* IXR-ec uses ECMP profiles, not absolute values. So "ecmp: 2" refers to profile #2 (MPLS)
+
+
 
 ### BGP l2-vpn status
 
