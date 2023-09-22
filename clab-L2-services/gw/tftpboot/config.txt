@@ -1,0 +1,598 @@
+# TiMOS-B-23.7.R1 both/x86_64 Nokia 7750 SR Copyright (c) 2000-2023 Nokia.
+# All rights reserved. All use subject to applicable license agreements.
+# Built on Fri Jul 7 17:49:28 UTC 2023 by builder in /builds/237B/R1/panos/main/sros
+# Configuration format version 23.7 revision 0
+
+# Generated 2023-09-22T00:10:13.6Z by admin from 172.31.255.29
+# Commit ID 9
+#   Committed 2023-09-21T23:51:26.9Z by admin (gNMI) from 172.31.255.29
+
+configure {
+    card 1 {
+        card-type iom-1
+        mda 1 {
+            mda-type me12-100gb-qsfp28
+        }
+    }
+    log {
+        filter "1001" {
+            named-entry "10" {
+                description "Collect only events of major severity or higher"
+                action forward
+                match {
+                    severity {
+                        gte major
+                    }
+                }
+            }
+        }
+        log-id "100" {
+            description "Default Serious Errors Log"
+            filter "1001"
+            source {
+                main true
+            }
+            destination {
+                memory {
+                    max-entries 500
+                }
+            }
+        }
+        log-id "99" {
+            description "Default System Log"
+            source {
+                main true
+            }
+            destination {
+                memory {
+                    max-entries 500
+                }
+            }
+        }
+    }
+    policy-options {
+        policy-statement "accept_all" {
+            default-action {
+                action-type accept
+            }
+        }
+        policy-statement "next-hop-self-ebgp-routes-only" {
+            entry 10 {
+                from {
+                    path-type ebgp
+                }
+                action {
+                    action-type accept
+                    next-hop self
+                }
+            }
+            default-action {
+                action-type accept
+            }
+        }
+    }
+    port 1/1/c1 {
+        admin-state enable
+        connector {
+            breakout c1-100g
+        }
+    }
+    port 1/1/c1/1 {
+        admin-state enable
+        ethernet {
+            mode network
+            mtu 8206
+            lldp {
+                dest-mac nearest-bridge {
+                    receive true
+                    transmit true
+                }
+            }
+        }
+    }
+    port 1/1/c2 {
+        admin-state enable
+        connector {
+            breakout c1-100g
+        }
+    }
+    port 1/1/c2/1 {
+        admin-state enable
+        ethernet {
+            mode network
+            mtu 8206
+            lldp {
+                dest-mac nearest-bridge {
+                    receive true
+                    transmit true
+                }
+            }
+        }
+    }
+    router "Base" {
+        autonomous-system 65000
+        ecmp 64
+        router-id 10.0.0.1
+        interface "i1/1/c1" {
+            admin-state enable
+            description "gw ~ r1 () vlan=0"
+            port 1/1/c1/1
+            ipv4 {
+                primary {
+                    address 10.11.0.17
+                    prefix-length 30
+                }
+            }
+        }
+        interface "i1/1/c2" {
+            admin-state enable
+            description "gw ~ r2 () vlan=0"
+            port 1/1/c2/1
+            ipv4 {
+                primary {
+                    address 10.11.0.21
+                    prefix-length 30
+                }
+            }
+        }
+        interface "lo1" {
+            admin-state enable
+            loopback
+            gre-termination true
+            ipv4 {
+                primary {
+                    address 10.0.255.1
+                    prefix-length 24
+                }
+            }
+        }
+        interface "system" {
+            admin-state enable
+            description "system interface vlan=0"
+            ipv4 {
+                primary {
+                    address 10.0.0.1
+                    prefix-length 32
+                }
+            }
+        }
+        bgp {
+            connect-retry 5
+            min-route-advertisement 1
+            client-reflect true
+            vpn-apply-export true
+            vpn-apply-import true
+            rapid-withdrawal true
+            ebgp-default-reject-policy {
+                import false
+                export false
+            }
+            rapid-update {
+                evpn true
+            }
+            multipath {
+                ebgp 64
+                ibgp 64
+            }
+            group "ibgp-ipv4" {
+                admin-state enable
+                local-address 10.0.0.1
+                peer-ip-tracking true
+                split-horizon true
+                family {
+                    ipv4 false
+                    ipv6 false
+                    l2-vpn true
+                    evpn true
+                }
+                cluster {
+                    cluster-id 10.0.0.1
+                }
+                next-hop-unchanged {
+                    evpn true
+                }
+                import {
+                    policy ["accept_all"]
+                }
+                export {
+                    policy ["next-hop-self-ebgp-routes-only"]
+                }
+            }
+            group "l2-vpn" {
+                admin-state enable
+                peer-as 65000
+                local-address 10.0.255.1
+                family {
+                    l2-vpn true
+                }
+                cluster {
+                    cluster-id 10.0.255.1
+                }
+                import {
+                    policy ["accept_all"]
+                }
+                export {
+                    policy ["accept_all"]
+                }
+            }
+            neighbor "10.0.0.2" {
+                description "r1"
+                group "ibgp-ipv4"
+                peer-as 65000
+            }
+            neighbor "10.0.0.3" {
+                description "r2"
+                group "ibgp-ipv4"
+                peer-as 65000
+            }
+            neighbor "10.0.0.4" {
+                description "r3"
+                group "ibgp-ipv4"
+                peer-as 65000
+            }
+            neighbor "10.0.0.5" {
+                description "r4"
+                group "ibgp-ipv4"
+                peer-as 65000
+            }
+            neighbor "10.0.1.1" {
+                group "l2-vpn"
+            }
+            neighbor "10.0.2.1" {
+                group "l2-vpn"
+            }
+        }
+        ldp {
+            admin-state enable
+            implicit-null-label true
+            interface-parameters {
+                interface "i1/1/c1" {
+                    admin-state enable
+                    ipv4 {
+                        admin-state enable
+                        transport-address system
+                    }
+                }
+                interface "i1/1/c2" {
+                    admin-state enable
+                    ipv4 {
+                        admin-state enable
+                        transport-address system
+                    }
+                }
+            }
+        }
+        mpls {
+            admin-state enable
+            interface "i1/1/c1" {
+                admin-state enable
+            }
+            interface "i1/1/c2" {
+                admin-state enable
+            }
+            interface "system" {
+                admin-state enable
+            }
+        }
+        ospf 0 {
+            admin-state enable
+            area 0.0.0.0 {
+                interface "i1/1/c1" {
+                    interface-type point-to-point
+                }
+                interface "i1/1/c2" {
+                    interface-type point-to-point
+                }
+                interface "lo1" {
+                    passive true
+                }
+                interface "system" {
+                    passive true
+                }
+            }
+        }
+        rsvp {
+            admin-state enable
+            interface "i1/1/c1" {
+                admin-state enable
+            }
+            interface "i1/1/c2" {
+                admin-state enable
+            }
+            interface "system" {
+                admin-state enable
+            }
+        }
+    }
+    service {
+        system {
+            vpn-gre-source-ip 10.0.255.1
+            bgp-auto-rd-range {
+                ip-address 10.0.0.1
+                community-value {
+                    start 60000
+                    end 65000
+                }
+            }
+        }
+    }
+    system {
+        name "gw"
+        grpc {
+            admin-state enable
+            allow-unsecure-connection
+            gnmi {
+                auto-config-save true
+            }
+            rib-api {
+                admin-state enable
+            }
+        }
+        management-interface {
+            netconf {
+                admin-state enable
+                auto-config-save true
+            }
+            yang-modules {
+                openconfig-modules true
+            }
+            snmp {
+                packet-size 9216
+                streaming {
+                    admin-state enable
+                }
+            }
+        }
+        bluetooth {
+            advertising-timeout 30
+        }
+        login-control {
+            ssh {
+                inbound-max-sessions 30
+            }
+        }
+        security {
+            aaa {
+                local-profiles {
+                    profile "administrative" {
+                        default-action permit-all
+                        entry 10 {
+                            match "configure system security"
+                            action permit
+                        }
+                        entry 20 {
+                            match "show system security"
+                            action permit
+                        }
+                        entry 30 {
+                            match "tools perform security"
+                            action permit
+                        }
+                        entry 40 {
+                            match "tools dump security"
+                            action permit
+                        }
+                        entry 50 {
+                            match "admin system security"
+                            action permit
+                        }
+                        entry 100 {
+                            match "configure li"
+                            action deny
+                        }
+                        entry 110 {
+                            match "show li"
+                            action deny
+                        }
+                        entry 111 {
+                            match "clear li"
+                            action deny
+                        }
+                        entry 112 {
+                            match "tools dump li"
+                            action deny
+                        }
+                        netconf {
+                            base-op-authorization {
+                                action true
+                                cancel-commit true
+                                close-session true
+                                commit true
+                                copy-config true
+                                create-subscription true
+                                delete-config true
+                                discard-changes true
+                                edit-config true
+                                get true
+                                get-config true
+                                get-data true
+                                get-schema true
+                                kill-session true
+                                lock true
+                                validate true
+                            }
+                        }
+                    }
+                    profile "default" {
+                        entry 10 {
+                            match "exec"
+                            action permit
+                        }
+                        entry 20 {
+                            match "exit"
+                            action permit
+                        }
+                        entry 30 {
+                            match "help"
+                            action permit
+                        }
+                        entry 40 {
+                            match "logout"
+                            action permit
+                        }
+                        entry 50 {
+                            match "password"
+                            action permit
+                        }
+                        entry 60 {
+                            match "show config"
+                            action deny
+                        }
+                        entry 65 {
+                            match "show li"
+                            action deny
+                        }
+                        entry 66 {
+                            match "clear li"
+                            action deny
+                        }
+                        entry 67 {
+                            match "tools dump li"
+                            action deny
+                        }
+                        entry 68 {
+                            match "state li"
+                            action deny
+                        }
+                        entry 70 {
+                            match "show"
+                            action permit
+                        }
+                        entry 75 {
+                            match "state"
+                            action permit
+                        }
+                        entry 80 {
+                            match "enable-admin"
+                            action permit
+                        }
+                        entry 90 {
+                            match "enable"
+                            action permit
+                        }
+                        entry 100 {
+                            match "configure li"
+                            action deny
+                        }
+                    }
+                }
+            }
+            ssh {
+                server-cipher-list-v2 {
+                    cipher 190 {
+                        name aes256-ctr
+                    }
+                    cipher 192 {
+                        name aes192-ctr
+                    }
+                    cipher 194 {
+                        name aes128-ctr
+                    }
+                    cipher 200 {
+                        name aes128-cbc
+                    }
+                    cipher 205 {
+                        name 3des-cbc
+                    }
+                    cipher 225 {
+                        name aes192-cbc
+                    }
+                    cipher 230 {
+                        name aes256-cbc
+                    }
+                }
+                client-cipher-list-v2 {
+                    cipher 190 {
+                        name aes256-ctr
+                    }
+                    cipher 192 {
+                        name aes192-ctr
+                    }
+                    cipher 194 {
+                        name aes128-ctr
+                    }
+                    cipher 200 {
+                        name aes128-cbc
+                    }
+                    cipher 205 {
+                        name 3des-cbc
+                    }
+                    cipher 225 {
+                        name aes192-cbc
+                    }
+                    cipher 230 {
+                        name aes256-cbc
+                    }
+                }
+                server-mac-list-v2 {
+                    mac 200 {
+                        name hmac-sha2-512
+                    }
+                    mac 210 {
+                        name hmac-sha2-256
+                    }
+                    mac 215 {
+                        name hmac-sha1
+                    }
+                    mac 220 {
+                        name hmac-sha1-96
+                    }
+                    mac 225 {
+                        name hmac-md5
+                    }
+                    mac 240 {
+                        name hmac-md5-96
+                    }
+                }
+                client-mac-list-v2 {
+                    mac 200 {
+                        name hmac-sha2-512
+                    }
+                    mac 210 {
+                        name hmac-sha2-256
+                    }
+                    mac 215 {
+                        name hmac-sha1
+                    }
+                    mac 220 {
+                        name hmac-sha1-96
+                    }
+                    mac 225 {
+                        name hmac-md5
+                    }
+                    mac 240 {
+                        name hmac-md5-96
+                    }
+                }
+            }
+            user-params {
+                local-user {
+                    user "admin" {
+                        password "$2y$10$TQrZlpBDra86.qoexZUzQeBXDY1FcdDhGWdD9lLxMuFyPVSm0OGy6"
+                        access {
+                            console true
+                            ftp true
+                            snmp true
+                            netconf true
+                            grpc true
+                        }
+                        console {
+                            member ["administrative"]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+persistent-indices {
+    description "Persistent indices are maintained by the system and must not be modified."
+    vrtr-if-id {
+        router-name "Base" interface-name "i1/1/c1" vrtr-id 1 if-index 2
+        router-name "Base" interface-name "i1/1/c2" vrtr-id 1 if-index 3
+        router-name "Base" interface-name "lo1" vrtr-id 1 if-index 4
+    }
+}
+
+# Finished 2023-09-22T00:10:13.6Z

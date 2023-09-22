@@ -60,8 +60,8 @@ ping aborted by user
 
 ## Status (on SR-1)
 
-|     Case      |   Working?  |
-| ------------- | ----------- |
+|     Case      |   Working?  |  Command
+| ------------- | ----------- | ---------------------------------------------
 |  VPLS-1       |     ✅      |  `ping 10.0.11.21 router-instance "client-1"`
 |  Epipe-2      |     ✅      |  `ping 10.0.12.22 router-instance "client-2"`
 |  BGP-VPLS-3   |     ✅      |  `ping 10.0.13.23 router-instance "client-3"`, requires SDP local/far end to match BGP peering addresses
@@ -75,8 +75,8 @@ The configuration for the services is similar, with a few key differences:
 * IXR-ec does not support GRE to/from a non-system loopback, or pxc (cross-connect) ports; those are FP4/FP5 specific features
 * IXR-ec uses ECMP profiles, not absolute values. So "ecmp: 2" refers to profile #2 (MPLS)
 
-|     Case      |   Working?  |
-| ------------- | ----------- |
+|     Case      |   Working?  |  Command
+| ------------- | ----------- | ------------------------------------------------------
 |  VPLS-1       |     ✅      |  `docker exec -it clab-L2-services-h1 ping 172.16.1.7`
 |  Epipe-2      |     ✅      |  `docker exec -it clab-L2-services-h1 ping 172.16.2.7`
 |  BGP-VPLS-3   |     ✅      |  `docker exec -it clab-L2-services-h1 ping 172.16.3.7`

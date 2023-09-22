@@ -1,0 +1,759 @@
+# TiMOS-B-23.7.R1 both/x86_64 Nokia 7250 IXR Copyright (c) 2000-2023 Nokia.
+# All rights reserved. All use subject to applicable license agreements.
+# Built on Fri Jul 7 17:49:28 UTC 2023 by builder in /builds/237B/R1/panos/main/sros
+# Configuration format version 23.7 revision 0
+
+# Generated 2023-09-22T00:09:42.6Z by admin from 172.31.255.29
+# Commit ID 9
+#   Committed 2023-09-21T23:51:38.5Z by admin (gNMI) from 172.31.255.29
+
+configure {
+    card 1 {
+        card-type imm4-1g-tx+20-1g-sfp+6-10g-sfp+
+        mda 1 {
+            mda-type m4-1g-tx+20-1g-sfp+6-10g-sfp+
+        }
+    }
+    log {
+        filter "1001" {
+            named-entry "10" {
+                description "Collect only events of major severity or higher"
+                action forward
+                match {
+                    severity {
+                        gte major
+                    }
+                }
+            }
+        }
+        log-id "100" {
+            description "Default Serious Errors Log"
+            filter "1001"
+            source {
+                main true
+            }
+            destination {
+                memory {
+                    max-entries 500
+                }
+            }
+        }
+        log-id "99" {
+            description "Default System Log"
+            source {
+                main true
+            }
+            destination {
+                memory {
+                    max-entries 500
+                }
+            }
+        }
+    }
+    policy-options {
+        policy-statement "accept_all" {
+            default-action {
+                action-type accept
+            }
+        }
+        policy-statement "next-hop-self-ebgp-routes-only" {
+            entry 10 {
+                from {
+                    path-type ebgp
+                }
+                action {
+                    action-type accept
+                    next-hop self
+                }
+            }
+            default-action {
+                action-type accept
+            }
+        }
+    }
+    port 1/1/1 {
+        admin-state enable
+        ethernet {
+            mode access
+            encap-type dot1q
+            mtu 8210
+            lldp {
+                dest-mac nearest-bridge {
+                    receive true
+                    transmit true
+                }
+            }
+        }
+    }
+    port 1/1/2 {
+        admin-state enable
+        ethernet {
+            mode network
+            mtu 8206
+            lldp {
+                dest-mac nearest-bridge {
+                    receive true
+                    transmit true
+                }
+            }
+        }
+    }
+    port 1/1/3 {
+        admin-state enable
+        ethernet {
+            mode network
+            mtu 8206
+            lldp {
+                dest-mac nearest-bridge {
+                    receive true
+                    transmit true
+                }
+            }
+        }
+    }
+    port 1/1/4 {
+    }
+    port 1/1/5 {
+    }
+    port 1/1/6 {
+    }
+    port 1/1/7 {
+    }
+    port 1/1/8 {
+    }
+    port 1/1/9 {
+    }
+    port 1/1/10 {
+    }
+    port 1/1/11 {
+    }
+    port 1/1/12 {
+    }
+    port 1/1/13 {
+    }
+    port 1/1/14 {
+    }
+    port 1/1/15 {
+    }
+    port 1/1/16 {
+    }
+    port 1/1/17 {
+    }
+    port 1/1/18 {
+    }
+    port 1/1/19 {
+    }
+    port 1/1/20 {
+    }
+    port 1/1/21 {
+    }
+    port 1/1/22 {
+    }
+    port 1/1/23 {
+    }
+    port 1/1/24 {
+    }
+    port 1/1/25 {
+    }
+    port 1/1/26 {
+    }
+    port 1/1/27 {
+    }
+    port 1/1/28 {
+    }
+    port 1/1/29 {
+    }
+    port 1/1/30 {
+    }
+    router "Base" {
+        autonomous-system 65000
+        ecmp 1
+        router-id 10.0.0.4
+        interface "i1/1/c2" {
+            admin-state enable
+            description "r3 ~ r1 () vlan=0"
+            port 1/1/2
+            ipv4 {
+                primary {
+                    address 10.11.0.6
+                    prefix-length 30
+                }
+            }
+        }
+        interface "i1/1/c3" {
+            admin-state enable
+            description "r3 ~ r4 () vlan=0"
+            port 1/1/3
+            ipv4 {
+                primary {
+                    address 10.11.0.13
+                    prefix-length 30
+                }
+            }
+        }
+        interface "system" {
+            admin-state enable
+            description "system interface vlan=0"
+            ipv4 {
+                primary {
+                    address 10.0.0.4
+                    prefix-length 32
+                }
+            }
+        }
+        bgp {
+            connect-retry 5
+            min-route-advertisement 1
+            client-reflect false
+            vpn-apply-export true
+            vpn-apply-import true
+            rapid-withdrawal true
+            ebgp-default-reject-policy {
+                import false
+                export false
+            }
+            rapid-update {
+                evpn true
+            }
+            multipath {
+                ebgp 16
+                ibgp 16
+            }
+            group "ibgp-ipv4" {
+                admin-state enable
+                local-address 10.0.0.4
+                family {
+                    ipv4 false
+                    ipv6 false
+                    l2-vpn true
+                    evpn true
+                }
+                import {
+                    policy ["accept_all"]
+                }
+                export {
+                    policy ["next-hop-self-ebgp-routes-only"]
+                }
+            }
+            neighbor "10.0.0.1" {
+                description "gw"
+                group "ibgp-ipv4"
+                peer-as 65000
+            }
+        }
+        ldp {
+            admin-state enable
+            implicit-null-label true
+            interface-parameters {
+                interface "i1/1/c2" {
+                    admin-state enable
+                    ipv4 {
+                        admin-state enable
+                        transport-address system
+                    }
+                }
+                interface "i1/1/c3" {
+                    admin-state enable
+                    ipv4 {
+                        admin-state enable
+                        transport-address system
+                    }
+                }
+            }
+            targeted-session {
+                peer 10.0.0.5 {
+                    local-lsr-id {
+                        interface-name "system"
+                    }
+                }
+            }
+        }
+        mpls {
+            admin-state enable
+            interface "i1/1/c2" {
+                admin-state enable
+            }
+            interface "i1/1/c3" {
+                admin-state enable
+            }
+            interface "system" {
+                admin-state enable
+            }
+            path "loose" {
+                admin-state enable
+            }
+            lsp "R3-R4" {
+                admin-state enable
+                type p2p-rsvp
+                to 10.0.0.5
+                primary "loose" {
+                }
+            }
+        }
+        ospf 0 {
+            admin-state enable
+            area 0.0.0.0 {
+                interface "i1/1/c2" {
+                    interface-type point-to-point
+                }
+                interface "i1/1/c3" {
+                    interface-type point-to-point
+                }
+                interface "system" {
+                    passive true
+                }
+            }
+        }
+        rsvp {
+            admin-state enable
+            interface "i1/1/c2" {
+                admin-state enable
+            }
+            interface "i1/1/c3" {
+                admin-state enable
+            }
+            interface "system" {
+                admin-state enable
+            }
+        }
+    }
+    service {
+        pw-template "PW1-use-prov-SDP" {
+            pw-template-id 1
+            provisioned-sdp use
+            vc-type ether
+            force-vc-forwarding vlan
+            control-word false
+        }
+        system {
+            bgp-auto-rd-range {
+                ip-address 10.0.0.4
+                community-value {
+                    start 60000
+                    end 65000
+                }
+            }
+        }
+        epipe "BGP-EVPN-VPWS" {
+            admin-state enable
+            description "EVPN for MPLS Tunnels in Epipe Services (EVPN-VPWS)"
+            service-id 16
+            customer "1"
+            bgp 1 {
+            }
+            sap 1/1/1:16 {
+            }
+            bgp-evpn {
+                evi 16
+                local-attachment-circuit "r3" {
+                    eth-tag 33
+                }
+                remote-attachment-circuit "r4" {
+                    eth-tag 44
+                }
+                mpls 1 {
+                    admin-state enable
+                    ecmp 2
+                    auto-bind-tunnel {
+                        resolution any
+                        ecmp 2
+                    }
+                }
+            }
+        }
+        epipe "BGP-VPWS-15" {
+            admin-state enable
+            description "BGP-VPWS with use provisioned SDP"
+            service-id 15
+            customer "1"
+            bgp 1 {
+                route-distinguisher auto-rd
+                route-target {
+                    export "target:64500:15"
+                    import "target:64500:15"
+                }
+                pw-template-binding "PW1-use-prov-SDP" {
+                }
+            }
+            bgp-vpws {
+                admin-state enable
+                local-ve {
+                    name "R3"
+                    id 3
+                }
+                remote-ve "R4" {
+                    id 4
+                }
+            }
+            sap 1/1/1:15 {
+            }
+        }
+        epipe "Epipe-12" {
+            admin-state enable
+            description "Epipe 2 with manually configured spoke-SDP"
+            service-id 12
+            customer "1"
+            spoke-sdp 120:12 {
+            }
+            sap 1/1/1:12 {
+            }
+        }
+        sdp 120 {
+            admin-state enable
+            delivery-type mpls
+            signaling tldp
+            far-end {
+                ip-address 10.0.0.5
+            }
+            lsp "R3-R4" { }
+        }
+        sdp 121 {
+            admin-state enable
+            delivery-type mpls
+            signaling bgp
+            far-end {
+                ip-address 10.0.0.5
+            }
+            lsp "R3-R4" { }
+        }
+        vpls "BGP-AD-VPLS-14" {
+            admin-state enable
+            description "BGP-AD for LDP VPLS with use provisioned SDP"
+            service-id 14
+            customer "1"
+            bgp 1 {
+                route-distinguisher auto-rd
+                route-target {
+                    export "target:64500:14"
+                    import "target:64500:14"
+                }
+                pw-template-binding "PW1-use-prov-SDP" {
+                }
+            }
+            bgp-ad {
+                admin-state enable
+                vpls-id "64500:14"
+            }
+            sap 1/1/1:14 {
+            }
+        }
+        vpls "BGP-VPLS-13" {
+            admin-state enable
+            description "BGP-VPLS with use provisioned SDP instead of spoke"
+            service-id 13
+            customer "1"
+            bgp 1 {
+                route-distinguisher auto-rd
+                route-target {
+                    export "target:64500:13"
+                    import "target:64500:13"
+                }
+                pw-template-binding "PW1-use-prov-SDP" {
+                }
+            }
+            bgp-vpls {
+                admin-state enable
+                maximum-ve-id 100
+                ve {
+                    name "r3"
+                    id 3
+                }
+            }
+            sap 1/1/1:13 {
+            }
+        }
+        vpls "VPLS-11" {
+            admin-state enable
+            description "VPLS 1 with manually configured spoke-SDP"
+            service-id 11
+            customer "1"
+            spoke-sdp 120:11 {
+            }
+            sap 1/1/1:11 {
+            }
+        }
+    }
+    system {
+        name "r3"
+        grpc {
+            admin-state enable
+            allow-unsecure-connection
+            gnmi {
+                auto-config-save true
+            }
+        }
+        management-interface {
+            netconf {
+                admin-state enable
+                auto-config-save true
+            }
+            snmp {
+                packet-size 9216
+                streaming {
+                    admin-state enable
+                }
+            }
+        }
+        resource {
+            ecmp-profile 1 {
+                type ip
+                links 16
+                groups 64
+            }
+            ecmp-profile 2 {
+                type mpls
+                links 16
+                groups 64
+            }
+        }
+        login-control {
+            ssh {
+                inbound-max-sessions 30
+            }
+        }
+        security {
+            aaa {
+                local-profiles {
+                    profile "administrative" {
+                        default-action permit-all
+                        entry 10 {
+                            match "configure system security"
+                            action permit
+                        }
+                        entry 20 {
+                            match "show system security"
+                            action permit
+                        }
+                        entry 30 {
+                            match "tools perform security"
+                            action permit
+                        }
+                        entry 40 {
+                            match "tools dump security"
+                            action permit
+                        }
+                        entry 50 {
+                            match "admin system security"
+                            action permit
+                        }
+                        entry 100 {
+                            match "configure li"
+                            action deny
+                        }
+                        entry 110 {
+                            match "show li"
+                            action deny
+                        }
+                        entry 111 {
+                            match "clear li"
+                            action deny
+                        }
+                        entry 112 {
+                            match "tools dump li"
+                            action deny
+                        }
+                        netconf {
+                            base-op-authorization {
+                                action true
+                                cancel-commit true
+                                close-session true
+                                commit true
+                                copy-config true
+                                create-subscription true
+                                delete-config true
+                                discard-changes true
+                                edit-config true
+                                get true
+                                get-config true
+                                get-data true
+                                get-schema true
+                                kill-session true
+                                lock true
+                                validate true
+                            }
+                        }
+                    }
+                    profile "default" {
+                        entry 10 {
+                            match "exec"
+                            action permit
+                        }
+                        entry 20 {
+                            match "exit"
+                            action permit
+                        }
+                        entry 30 {
+                            match "help"
+                            action permit
+                        }
+                        entry 40 {
+                            match "logout"
+                            action permit
+                        }
+                        entry 50 {
+                            match "password"
+                            action permit
+                        }
+                        entry 60 {
+                            match "show config"
+                            action deny
+                        }
+                        entry 65 {
+                            match "show li"
+                            action deny
+                        }
+                        entry 66 {
+                            match "clear li"
+                            action deny
+                        }
+                        entry 67 {
+                            match "tools dump li"
+                            action deny
+                        }
+                        entry 70 {
+                            match "show"
+                            action permit
+                        }
+                        entry 75 {
+                            match "state"
+                            action permit
+                        }
+                        entry 80 {
+                            match "enable-admin"
+                            action permit
+                        }
+                        entry 90 {
+                            match "enable"
+                            action permit
+                        }
+                        entry 100 {
+                            match "configure li"
+                            action deny
+                        }
+                    }
+                }
+            }
+            ssh {
+                server-cipher-list-v2 {
+                    cipher 190 {
+                        name aes256-ctr
+                    }
+                    cipher 192 {
+                        name aes192-ctr
+                    }
+                    cipher 194 {
+                        name aes128-ctr
+                    }
+                    cipher 200 {
+                        name aes128-cbc
+                    }
+                    cipher 205 {
+                        name 3des-cbc
+                    }
+                    cipher 225 {
+                        name aes192-cbc
+                    }
+                    cipher 230 {
+                        name aes256-cbc
+                    }
+                }
+                client-cipher-list-v2 {
+                    cipher 190 {
+                        name aes256-ctr
+                    }
+                    cipher 192 {
+                        name aes192-ctr
+                    }
+                    cipher 194 {
+                        name aes128-ctr
+                    }
+                    cipher 200 {
+                        name aes128-cbc
+                    }
+                    cipher 205 {
+                        name 3des-cbc
+                    }
+                    cipher 225 {
+                        name aes192-cbc
+                    }
+                    cipher 230 {
+                        name aes256-cbc
+                    }
+                }
+                server-mac-list-v2 {
+                    mac 200 {
+                        name hmac-sha2-512
+                    }
+                    mac 210 {
+                        name hmac-sha2-256
+                    }
+                    mac 215 {
+                        name hmac-sha1
+                    }
+                    mac 220 {
+                        name hmac-sha1-96
+                    }
+                    mac 225 {
+                        name hmac-md5
+                    }
+                    mac 240 {
+                        name hmac-md5-96
+                    }
+                }
+                client-mac-list-v2 {
+                    mac 200 {
+                        name hmac-sha2-512
+                    }
+                    mac 210 {
+                        name hmac-sha2-256
+                    }
+                    mac 215 {
+                        name hmac-sha1
+                    }
+                    mac 220 {
+                        name hmac-sha1-96
+                    }
+                    mac 225 {
+                        name hmac-md5
+                    }
+                    mac 240 {
+                        name hmac-md5-96
+                    }
+                }
+            }
+            user-params {
+                local-user {
+                    user "admin" {
+                        password "$2y$10$TQrZlpBDra86.qoexZUzQeBXDY1FcdDhGWdD9lLxMuFyPVSm0OGy6"
+                        access {
+                            console true
+                            ftp true
+                            snmp true
+                            netconf true
+                            grpc true
+                        }
+                        console {
+                            member ["administrative"]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+persistent-indices {
+    description "Persistent indices are maintained by the system and must not be modified."
+    vrtr-if-id {
+        router-name "Base" interface-name "i1/1/c2" vrtr-id 1 if-index 2
+        router-name "Base" interface-name "i1/1/c3" vrtr-id 1 if-index 3
+    }
+    mpls-lsp-index {
+        lsp-name "R3-R4" type 2 lsp-index 1
+    }
+    mpls-path-index {
+        router-id 1 path-name "loose" path-index 1
+    }
+}
+
+# Finished 2023-09-22T00:09:42.6Z
