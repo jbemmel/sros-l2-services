@@ -6,8 +6,8 @@ message: |
   See https://documentation.nokia.com/cgi-bin/dbaccessfilename.cgi/3HE14991AAAITQZZA01_V1_Advanced%20Configuration%20Guide%20Part%20II%20for%20Releases%20Up%20To%2022.10.R3.pdf
   page 102 and page 494
 
-  When deployed, the hosts should be able to reach each other:
-  docker exec -it clab-MPLS-L2-VPN-h1 ping -c3 172.16.0.7
+  When deployed, the hosts should be able to reach each other (via IXR-ec):
+  docker exec -it clab-L2-services-h1 bash -c "for i in {1..6}; do ping -c2 172.16.\${i}.7; done"
 
 provider: clab
 

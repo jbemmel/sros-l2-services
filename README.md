@@ -77,11 +77,11 @@ The configuration for the services is similar, with a few key differences:
 
 |     Case      |   Working?  |
 | ------------- | ----------- |
-|  VPLS-1       |     ❌      |  `docker exec -it clab-L2-services-h1 ping 172.16.1.7`
-|  Epipe-2      |     ❌      |  `docker exec -it clab-L2-services-h1 ping 172.16.2.7`
-|  BGP-VPLS-3   |     ❌      |  `docker exec -it clab-L2-services-h1 ping 172.16.3.7`
-| BGP-AD-VPLS-4 |     ❌      |  `docker exec -it clab-L2-services-h1 ping 172.16.4.7`
-|  BGP-VPWS-5   |     ❌      |  `docker exec -it clab-L2-services-h1 ping 172.16.5.7`
+|  VPLS-1       |     ✅      |  `docker exec -it clab-L2-services-h1 ping 172.16.1.7`
+|  Epipe-2      |     ✅      |  `docker exec -it clab-L2-services-h1 ping 172.16.2.7`
+|  BGP-VPLS-3   |     ✅      |  `docker exec -it clab-L2-services-h1 ping 172.16.3.7`
+| BGP-AD-VPLS-4 |     ✅      |  `docker exec -it clab-L2-services-h1 ping 172.16.4.7`
+|  BGP-VPWS-5   |     ✅      |  `docker exec -it clab-L2-services-h1 ping 172.16.5.7`
 | BGP-EVPN-VPWS |     ✅      |  `docker exec -it clab-L2-services-h1 ping 172.16.6.7`
 
 
