@@ -84,7 +84,7 @@ The configuration for the services is similar, with a few key differences:
 |  BGP-VPWS-5   |     ✅      |  `docker exec -it clab-L2-services-h1 ping 172.16.5.7`
 | BGP-EVPN-VPWS |     ✅      |  `docker exec -it clab-L2-services-h1 ping 172.16.6.7`
 
-
+See the [7750 Release Notes](https://documentation.nokia.com/aces/cgi-bin/dbaccessfilename.cgi/3HE192690005TQZZA01_V1_SR%20OS%2023.7.R2%20Software%20Release%20Notes.pdf) section 12 for details on "SR OS features not supported on IXR"
 
 ### BGP l2-vpn status
 
