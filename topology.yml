@@ -130,3 +130,29 @@ links:
 - r2:
   gw:
   pool: core
+
+validate:
+ ping_ixr_vpls_1:
+    description: Check VPLS-1
+    nodes: [ h1 ]
+    plugin: ping('172.16.1.7')
+ ping_ixr_vpls_2:
+    description: Check EPipe-2
+    nodes: [ h1 ]
+    plugin: ping('172.16.2.7')
+ ping_ixr_vpls_3:
+    description: Check BGP VPLS-3
+    nodes: [ h1 ]
+    plugin: ping('172.16.3.7')
+ ping_ixr_vpls_4:
+    description: Check BGP AD VPLS-4
+    nodes: [ h1 ]
+    plugin: ping('172.16.4.7')
+ ping_ixr_vpls_5:
+    description: Check BGP VPWS VPLS-5
+    nodes: [ h1 ]
+    plugin: ping('172.16.5.7')
+ ping_ixr_vpls_6:
+    description: Check BGP EVPN VPLS-6
+    nodes: [ h1 ]
+    plugin: ping('172.16.6.7')
