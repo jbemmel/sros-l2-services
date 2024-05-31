@@ -1,3 +1,8 @@
+delete:
+
+# Remove neighbor level address family configs, they override the group level
+- configure/router/bgp/neighbor[ip-address=*]/family
+
 {% set GRE_SRC="10.0.255.1" %}
 
 updates:
@@ -31,6 +36,7 @@ updates:
 
 - path: configure/router[router-name=Base]/bgp
   val:
+   client-reflect: True
    group:
    - group-name: l2-vpn
      admin-state: enable

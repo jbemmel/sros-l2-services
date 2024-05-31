@@ -7,6 +7,9 @@ delete:
 - configure/service/vpls[service-name=vlan{{c}}]
 {% endfor %}
 
+# Remove neighbor level address family configs, they override the group level
+- configure/router/bgp/neighbor[ip-address=*]/family
+
 # 7250 IXR does not support using a secondary loopback for GRE (vpn-gre-source-ip), use single loopback
 {% set GRE_SRC="10.0.0.5" %}
 
