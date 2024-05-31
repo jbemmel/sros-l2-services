@@ -118,6 +118,8 @@ updates:
    - sdp-id: 120
      admin-state: enable
      signaling: tldp  # default
+     ldp: True        # Use LDP, not RSVP
+     mixed-lsp-mode: { } # Required for LDP
      far-end:
       ip-address: "10.0.0.5"
      # local-end: "{{ GRE_SRC }}" # implied
@@ -128,6 +130,8 @@ updates:
    - sdp-id: 121
      admin-state: enable
      signaling: bgp
+     ldp: True        # Use LDP, not RSVP
+     mixed-lsp-mode: { } # Required for LDP
      far-end:
       ip-address: "10.0.0.5"  # Must match BGP peering IP
      # local-end: "{{ GRE_SRC }}" # implied
